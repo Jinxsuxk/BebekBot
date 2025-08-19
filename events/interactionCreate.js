@@ -5,6 +5,7 @@ module.exports = {
     async execute(interaction) {
         console.log('Interaction received:', interaction.commandName);
         if (!interaction.isChatInputCommand()) return;
+        await interaction.deferReply();
         const command = interaction.client.commands.get(interaction.commandName);
         if (!command) {
             console.error(`No command matching ${interaction.commandName} was found.`);
