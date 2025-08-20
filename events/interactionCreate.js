@@ -5,6 +5,12 @@ module.exports = {
     async execute(interaction) {
         console.log('Interaction received:', interaction.commandName);
         if (!interaction.isChatInputCommand()) return;
+        if (!interaction.client.isReadyForCommands) {
+            return interaction.reply({
+                content: '⚡ Bot is restarting, please try again in a few minutes.',
+                flags: MessageFlags.Ephemeral
+            });
+        }
         const command = interaction.client.commands.get(interaction.commandName);
         if (!command) {
             console.error(`No command matching ${interaction.commandName} was found.`);
