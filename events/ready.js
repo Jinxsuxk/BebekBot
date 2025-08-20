@@ -1,6 +1,6 @@
 const {Events} = require('discord.js')
 
-const STARTUP_DELAY = 4 * 60 * 1000;
+const STARTUP_DELAY = 5 * 60 * 1000;
 module.exports = {
     name: Events.ClientReady,
     once: true,
