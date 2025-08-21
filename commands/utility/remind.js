@@ -16,7 +16,7 @@ module.exports = {
     async execute(interaction){
         const timeInput = interaction.options.getString('time');
         const message = interaction.options.getString('message')
-        const date = chrono.parseDate(timeInput, new Date(), { timezone: 0 });
+        const date = chrono.parseDate(timeInput, new Date(), { timezone: -4 });
         const delay = date.getTime() - Date.now()
         const unix = Math.floor(date.getTime() / 1000)
 
