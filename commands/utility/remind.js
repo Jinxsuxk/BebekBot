@@ -16,7 +16,7 @@ module.exports = {
     async execute(interaction){
         const timeInput = interaction.options.getString('time');
         const message = interaction.options.getString('message')
-        const date = chrono.parseDate(timeInput)
+        const date = chrono.parseDate(timeInput, new Date(), { timezone: 0 });
         const delay = date.getTime() - Date.now()
         const unix = Math.floor(date.getTime() / 1000)
 
@@ -29,7 +29,7 @@ module.exports = {
         await interaction.reply(`✅ I will remind you to **${message}** at <t:${unix}:F> (<t:${unix}:R>)`);
 
         setTimeout(() => {
-            interaction.user.send(`⏰ Reminder: **${message}** (requested at ${interaction.createdAt.toUTCString()})`);
+            interaction.user.send(`⏰ Reminder: **${message}** (requested at ${interaction.createdAt})`);
         }, delay);
     }
 }
