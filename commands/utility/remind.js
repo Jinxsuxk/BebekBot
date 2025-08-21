@@ -16,7 +16,11 @@ module.exports = {
     async execute(interaction){
         const timeInput = interaction.options.getString('time');
         const message = interaction.options.getString('message')
-        const date = chrono.parseDate(timeInput, new Date(), { timezone: -240 });
+        console.log(timeInput)
+        const date = chrono.parseDate(timeInput, new Date(), { timezone: 240 });
+        console.log(date.toString()); // Shows in server's timezone
+        console.log(date.toISOString()); // Shows UTC
+        console.log(date.getTime()); // Epoch ms (always correct)
         const delay = date.getTime() - Date.now()
         const unix = Math.floor(date.getTime() / 1000)
 
