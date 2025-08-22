@@ -34,10 +34,11 @@ module.exports = {
         const timeInput = interaction.options.getString('time');
         const message = interaction.options.getString('message')
 
-        const date = chrono.parseDate(timeInput, new Date());
+        const offsetMinutes = DateTime.local().setZone(userTimezone).offset;
+        const date = chrono.parseDate(timeInput, new Date(), { timezone: offsetMinutes });
         if (!date) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
 
-        const userDate = DateTime.fromJSDate(date, { zone: userTimezone });
+        const userDate = DateTime.fromJSDate(date).setZone(userTimezone, { keepLocalTime: true });
         const utcDate = userDate.toUTC();
         const unix = Math.floor(utcDate.toSeconds());
 
