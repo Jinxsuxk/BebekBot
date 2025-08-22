@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, MessageFlags} = require('discord.js')
 const chrono = require('chrono-node')
 const supabase = require('../../database/db')
+const {DateTime} = require('luxon')
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -36,13 +37,14 @@ module.exports = {
         const date = chrono.parseDate(timeInput, new Date());
         if (!date) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
 
-        const utcDate = new Date(date.toLocaleString("en-US", { timeZone: userTimezone }));
-        const unix = Math.floor(utcDate.getTime() / 1000);
+        const userDate = DateTime.fromJSDate(date, { zone: userTimezone });
+        const utcDate = userDate.toUTC();
+        const unix = Math.floor(utcDate.toSeconds());
 
         const { error: insertError } = await supabase.from('reminders').insert({
             user_id: userId,
             message: message,
-            remind_at: utcDate.toISOString()
+            remind_at: utcDate
         });
 
         if (insertError) {
