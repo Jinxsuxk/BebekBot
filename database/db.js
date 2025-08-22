@@ -1,11 +1,9 @@
-// const Database = require('better-sqlite3');
-// const db = new Database('reminderbot.db');
+const { createClient } = require('@supabase/supabase-js')
+require('dotenv').config();
 
-// db.prepare(`
-//   CREATE TABLE IF NOT EXISTS users (
-//     userId TEXT PRIMARY KEY,
-//     timezone TEXT
-//   )
-// `).run();
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_KEY
+);
 
-// module.exports = db;
+module.exports = supabase;

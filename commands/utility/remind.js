@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, MessageFlags} = require('discord.js')
 const chrono = require('chrono-node')
+const supabase = require('../../database/db')
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,26 +15,41 @@ module.exports = {
                 .setDescription('What to remind you about')
                 .setRequired(true)),
     async execute(interaction){
+        const userId = interaction.user.id;
+        const {data: userData, error} = await supabase
+            .from('users')
+            .select('timezone')
+            .eq('user_id', userId)
+            .single();
+        if (error) console.error(error);
+        if (!userData) {
+            return interaction.reply({
+                content: "❌ You haven't set your timezone yet. Please use `/settimezone` first.",
+                flags: MessageFlags.Ephemeral
+            });
+        }
+        const userTimezone = userData.timezone;
         const timeInput = interaction.options.getString('time');
         const message = interaction.options.getString('message')
-        console.log(timeInput)
-        const date = chrono.parseDate(timeInput, new Date(), { timezone: 240 });
-        console.log(date.toString()); // Shows in server's timezone
-        console.log(date.toISOString()); // Shows UTC
-        console.log(date.getTime()); // Epoch ms (always correct)
-        const delay = date.getTime() - Date.now()
-        const unix = Math.floor(date.getTime() / 1000)
 
-        if (!date) {
-            return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
-        }
-        if (delay <= 0) {
-            return interaction.reply({ content: '❌ That time is in the past.', flags: MessageFlags.Ephemeral });
-        }
-        await interaction.reply(`✅ I will remind you to **${message}** at <t:${unix}:F> (<t:${unix}:R>)`);
+        const date = chrono.parseDate(timeInput, new Date());
+        if (!date) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
 
-        setTimeout(() => {
-            interaction.user.send(`⏰ Reminder: **${message}** (requested at ${interaction.createdAt})`);
-        }, delay);
+        const utcDate = new Date(date.toLocaleString("en-US", { timeZone: userTimezone }));
+        const unix = Math.floor(utcDate.getTime() / 1000);
+
+        const { error: insertError } = await supabase.from('reminders').insert({
+            user_id: userId,
+            message: message,
+            remind_at: utcDate.toISOString()
+        });
+
+        if (insertError) {
+            console.error(insertError);
+            return interaction.reply({ content: "❌ Failed to save reminder.", flags: MessageFlags.Ephemeral });
+        }        
+
+        await interaction.reply(`✅ I will remind you to **${message}** at <t:${unix}:F>`);
+
     }
 }
