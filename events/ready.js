@@ -15,7 +15,6 @@ module.exports = {
     once: true,
     async execute(client) {
         console.log(`✅ Ready! Logged in as ${client.user.tag}`);
-        console.log(`⏳ Warming up for ${STARTUP_DELAY / 1000} seconds...`);
 
         client.isReadyForCommands = false;
 
@@ -23,6 +22,7 @@ module.exports = {
             client.isReadyForCommands = true;
             console.log("🚀 Bot is now fully ready!");
         }, STARTUP_DELAY);
+
         startMinuteInterval(() => checkReminders(client));
 
         const commands = [];
@@ -67,5 +67,6 @@ module.exports = {
         } catch (error) {
             console.error(`❌ Failed to reload commands:`, error);
         }
+        console.log(`⏳ Warming up for ${STARTUP_DELAY / 1000} seconds...`);
     },
 };
