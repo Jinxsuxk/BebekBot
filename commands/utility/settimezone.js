@@ -5,6 +5,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('settimezone')
     .setDescription('Set your timezone (IANA format, e.g. "Asia/Kuala_Lumpur", "America/New_York")')
+    .setContexts([0, 1, 2])
     .addStringOption(option =>
       option.setName('timezone')
         .setDescription('Your timezone')

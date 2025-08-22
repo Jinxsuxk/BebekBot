@@ -4,7 +4,7 @@ const path = require('path');
 const {checkReminders} = require('../checkRm/checkRm')
 const {startMinuteInterval} = require('../checkRm/startInterval')
 
-const STARTUP_DELAY = 1000 //5 * 60 * 1000;
+const STARTUP_DELAY = 5 * 60 * 1000;
 
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.APP_ID;

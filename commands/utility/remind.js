@@ -6,6 +6,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('remind')
         .setDescription('Set a reminder')
+        .setContexts([0, 1, 2])
         .addStringOption(option =>
             option.setName('time')
                 .setDescription('When to remind')
