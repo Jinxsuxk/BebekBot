@@ -1,34 +1,52 @@
 const { SlashCommandBuilder, MessageFlags} = require('discord.js');
 const supabase = require('../../database/db');
+const cityTimezones = require('city-timezones');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('settimezone')
-    .setDescription('Set your timezone (IANA format, e.g. "Asia/Kuala_Lumpur", "America/New_York")')
+    .setDescription('Set your timezone by city and country')
     .setContexts([0, 1, 2])
     .addStringOption(option =>
-      option.setName('timezone')
-        .setDescription('Your timezone')
-        .setRequired(true)
-    ),
+      option.setName('city')
+        .setDescription('Your city (e.g., Kuala Lumpur)')
+        .setRequired(true))
+    .addStringOption(option =>
+      option.setName('country')
+          .setDescription('Your country (e.g., Malaysia)')
+          .setRequired(true)),
   async execute(interaction) {
-    const userTimezone = interaction.options.getString('timezone');
+    const city = interaction.options.getString('city');
+    const country = interaction.options.getString('country');
     const userId = interaction.user.id;
 
-    try {
-      Intl.DateTimeFormat(undefined, { timeZone: userTimezone });
-    } catch (err) {
-      return interaction.reply({
-        content: '❌ Invalid timezone. Use a valid IANA timezone (e.g. "Asia/Kuala_Lumpur").',
-        flags: MessageFlags.Ephemeral
+    const matches = cityTimezones.findFromCityStateProvince(city);
+    const filtered = matches.filter(m => 
+        m.country.toLowerCase() === country.toLowerCase()
+    );
+    if (filtered.length === 0) {
+        return interaction.reply({
+            content: `❌ Could not find timezone for **${city}, ${country}**.`,
+            flags: MessageFlags.Ephemeral
+        });
+    }
+    const timezone = filtered[0].timezone;
+
+    const { error } = await supabase
+      .from('users')
+      .upsert({
+          user_id: interaction.user.id,
+          timezone: timezone
       });
+
+    if (error) {
+        console.error(error);
+        return interaction.reply({
+            content: '❌ Failed to save timezone.',
+            flags: MessageFlags.Ephemeral
+        });
     }
 
-    await supabase.from('users').upsert({
-      user_id: userId,
-      timezone: userTimezone, // e.g., "America/New_York"
-    });
-
-    await interaction.reply(`✅ Your timezone has been set to **${userTimezone}**.`);
+    await interaction.reply(`✅ Your timezone has been set to **${timezone}**.`);
   }
 };
