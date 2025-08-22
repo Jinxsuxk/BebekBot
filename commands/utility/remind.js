@@ -44,7 +44,7 @@ module.exports = {
         const { error: insertError } = await supabase.from('reminders').insert({
             user_id: userId,
             message: message,
-            remind_at: utcDate
+            remind_at: utcDate.toISO()
         });
 
         if (insertError) {
