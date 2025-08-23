@@ -4,7 +4,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('reload')
         .setDescription('Reloads a command.')
-        .setContexts([0, 1, 2])
+        .setDefaultMemberPermissions(0)
         .addStringOption(option =>
             option.setName('command')
                 .setDescription('The command to reload.')

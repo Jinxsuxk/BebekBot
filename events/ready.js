@@ -8,7 +8,6 @@ const STARTUP_DELAY = 5 * 60 * 1000;
 
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.APP_ID;
-// const guildId = process.env.SERVER_ID;
 
 module.exports = {
     name: Events.ClientReady,
@@ -48,21 +47,10 @@ module.exports = {
 
         try {
             console.log(`🔄 Refreshing ${commands.length} application (/) commands...`);
-
-            // Global commands
             const data = await rest.put(
                 Routes.applicationCommands(clientId),
                 { body: commands },
             );
-
-            // Guild commands
-            /*
-            const data = await rest.put(
-                Routes.applicationGuildCommands(clientId, guildId),
-                { body: commands },
-            );
-            */
-
             console.log(`✅ Successfully reloaded ${data.length} application (/) commands.`);
         } catch (error) {
             console.error(`❌ Failed to reload commands:`, error);

@@ -18,7 +18,6 @@ module.exports = {
   async execute(interaction) {
     const city = interaction.options.getString('city');
     const country = interaction.options.getString('country');
-    const userId = interaction.user.id;
 
     const matches = cityTimezones.findFromCityStateProvince(city);
     const filtered = matches.filter(m => 
@@ -46,7 +45,14 @@ module.exports = {
             flags: MessageFlags.Ephemeral
         });
     }
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: timezone,
+      timeZoneName: "short"
+    });
 
-    await interaction.reply(`✅ Your timezone has been set to **${timezone}**.`);
+    const parts = formatter.formatToParts(new Date());
+    const tzName = parts.find(p => p.type === "timeZoneName")?.value;
+
+    await interaction.reply(`✅ Your timezone has been set to **${timezone}** (${tzName}).`);
   }
 };
