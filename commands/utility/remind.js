@@ -38,9 +38,9 @@ module.exports = {
         if (!date) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
 
         const now = DateTime.utc().setZone(userTimezone)
-        if (date < now) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
-
         const userDate = DateTime.fromJSDate(date).setZone(userTimezone, { keepLocalTime: true });
+        if (userDate < now) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
+
         const utcDate = userDate.toUTC();
         const unix = Math.floor(utcDate.toSeconds());
 
