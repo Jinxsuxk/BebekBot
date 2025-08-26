@@ -46,8 +46,6 @@ module.exports = {
 
         const now = DateTime.now().setZone(userTimezone)
         const userDate = DateTime.fromJSDate(date).setZone(userTimezone, { keepLocalTime: true });
-        console.log(now)
-        console.log(userDate)
         if (userDate < now) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
 
         const utcDate = userDate.toUTC();
