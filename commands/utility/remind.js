@@ -17,6 +17,12 @@ module.exports = {
                 .setDescription('What to remind you about')
                 .setRequired(true)),
     async execute(interaction){
+        if (interaction.context === 2) {
+            return interaction.reply({
+                content: "❌ Sorry, I cannot send reminders in group DMs. Please use a server channel or DM me directly.", 
+                flags: MessageFlags.Ephemeral
+            });
+        }
         const userId = interaction.user.id;
         const {data: userData} = await supabase
             .from('users')
@@ -34,7 +40,8 @@ module.exports = {
         const message = interaction.options.getString('message')
 
         const offsetMinutes = DateTime.local().setZone(userTimezone).offset;
-        const date = chrono.parseDate(timeInput, new Date(), { timezone: offsetMinutes });
+        const baseDate = DateTime.now().setZone(userTimezone).toJSDate();
+        const date = chrono.parseDate(timeInput, baseDate, { timezone: offsetMinutes });
         if (!date) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
 
         const now = DateTime.utc().setZone(userTimezone)
@@ -44,10 +51,23 @@ module.exports = {
         const utcDate = userDate.toUTC();
         const unix = Math.floor(utcDate.toSeconds());
 
+        let guildId = false;
+        if (interaction.channel) {
+            const permission = interaction.channel.permissionsFor(interaction.guild.members.me)
+            if (!permission.has("SendMessages") || !permission.has("ViewChannel")) {
+                return interaction.reply({
+                    content: "⚠️ I don't have permission to send messages in this channel. Please enable **View Channel** and **Send Messages** in the channel settings.",
+                    flags: MessageFlags.Ephemeral
+                });
+            }
+            guildId = interaction.guild;
+        }
         const { error: insertError } = await supabase.from('reminders').insert({
             user_id: userId,
             message: message,
-            remind_at: utcDate.toISO()
+            remind_at: utcDate.toISO(),
+            channel_id: interaction.channelId,
+            guild_id: guildId
         });
 
         if (insertError) {

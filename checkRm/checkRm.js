@@ -10,8 +10,14 @@ const checkReminders = async (client) => {
     
     for(const reminder of reminders){
         try {
-            const user = await client.users.fetch(reminder.user_id)
-            await user.send(`⏰ Reminder: **${reminder.message}**`);
+            if (reminder.guild_id === "false") {
+                const user = await client.users.fetch(reminder.user_id); 
+                await user.send(`⏰ Reminder: **${reminder.message}**`);
+            }
+            else {
+                const channel = await client.channels.fetch(reminder.channel_id);
+                await channel.send(`⏰ <@${reminder.user_id}>, reminder: **${reminder.message}**`);
+            }
         } catch (err){
             console.error(`Failed to DM ${reminder.user_id}`, err);
         }
