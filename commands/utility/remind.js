@@ -52,7 +52,7 @@ module.exports = {
         const unix = Math.floor(utcDate.toSeconds());
 
         let guildId = false;
-        if (interaction.channel) {
+        if (interaction.guild) {
             const permission = interaction.channel.permissionsFor(interaction.guild.members.me)
             if (!permission.has("SendMessages") || !permission.has("ViewChannel")) {
                 return interaction.reply({
