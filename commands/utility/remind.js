@@ -44,7 +44,7 @@ module.exports = {
         const date = chrono.parseDate(timeInput, baseDate, { timezone: offsetMinutes });
         if (!date) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
 
-        const now = DateTime.utc().setZone(userTimezone)
+        const now = DateTime.now().setZone(userTimezone)
         const userDate = DateTime.fromJSDate(date).setZone(userTimezone, { keepLocalTime: true });
         console.log(now)
         console.log(userDate)
