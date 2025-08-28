@@ -47,6 +47,11 @@ module.exports = {
         
         const userDate = DateTime.fromJSDate(date).setZone(userTimezone, { keepLocalTime: true });
         const utcDate = userDate.toUTC();
+        console.log(offsetMinutes)
+        console.log(baseDate)
+        console.log(date)
+        console.log(userDate)
+        console.log(utcDate)
 
         let guildId = false;
         if (interaction.guild) {
