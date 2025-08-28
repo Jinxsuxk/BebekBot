@@ -39,17 +39,14 @@ module.exports = {
         const timeInput = interaction.options.getString('time');
         const message = interaction.options.getString('message')
 
-        const offsetMinutes = DateTime.local().setZone(userTimezone).offset;
+        const offsetMinutes = DateTime.now().setZone(userTimezone).offset;
         const baseDate = DateTime.now().setZone(userTimezone).toJSDate();
         const date = chrono.parseDate(timeInput, baseDate, { timezone: offsetMinutes });
         if (!date) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
-
-        const now = DateTime.now().setZone(userTimezone)
+        if (date < baseDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
+        
         const userDate = DateTime.fromJSDate(date).setZone(userTimezone, { keepLocalTime: true });
-        if (userDate < now) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
-
         const utcDate = userDate.toUTC();
-        const unix = Math.floor(utcDate.toSeconds());
 
         let guildId = false;
         if (interaction.guild) {
@@ -73,9 +70,9 @@ module.exports = {
         if (insertError) {
             console.error(insertError);
             return interaction.reply({ content: "❌ Failed to save reminder.", flags: MessageFlags.Ephemeral });
-        }        
+        }
 
+        const unix = Math.floor(utcDate.toSeconds());
         await interaction.reply(`✅ I will remind you to **${message}** at <t:${unix}:F>`);
-
     }
 }
