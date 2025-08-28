@@ -43,7 +43,6 @@ module.exports = {
         const baseDate = DateTime.now().setZone(userTimezone).toJSDate();
         const date = chrono.parseDate(timeInput, baseDate, { timezone: offsetMinutes });
         if (!date) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
-        if (date < baseDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
         
         const userDate = DateTime.fromJSDate(date).setZone(userTimezone, { keepLocalTime: true });
         const utcDate = userDate.toUTC();
@@ -52,6 +51,7 @@ module.exports = {
         console.log(date)
         console.log(userDate)
         console.log(utcDate)
+        if (utcDate < DateTime.now().setZone(userTimezone)) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
 
         let guildId = false;
         if (interaction.guild) {
