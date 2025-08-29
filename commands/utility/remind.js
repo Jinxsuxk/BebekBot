@@ -50,7 +50,7 @@ module.exports = {
             utcDate = finalDate;
         }
         else {
-            const baseDate = nowDate.toJSDate();
+            const baseDate = nowDate.toUTC().toJSDate();
             const offsetMinutes = nowDate.offset;
             const parsed = chrono.parseDate(timeInput, baseDate, {
                 timezone: offsetMinutes,
@@ -65,6 +65,7 @@ module.exports = {
         }
         if (utcDate < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
         console.log(utcDate)
+        console.log(nowDate)
 
         let guildId = false;
         if (interaction.guild) {
