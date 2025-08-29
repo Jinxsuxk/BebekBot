@@ -56,6 +56,9 @@ module.exports = {
                 timezone: offsetMinutes,
                 forwardDate: true
             });
+            console.log(timeInput)
+            console.log(baseDate)
+            console.log(offsetMinutes)
             console.log(parsed)
             if (!parsed) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral }); 
             utcDate = DateTime.fromJSDate(parsed).setZone(userTimezone);
