@@ -46,15 +46,16 @@ module.exports = {
         // let res = value.match(regex); if (res && res[0] === value) doSomething();
         let utcDate;
         if (hhmmRegex.test(timeInput)){
-            let target = DateTime.fromFormat(timeInput, "H:mm", { zone: userTimezone });
+            const target = DateTime.fromFormat(timeInput, "H:mm", { zone: userTimezone });
+            console.log(target)
             if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
             utcDate = target;
-            console.log(target)
             console.log('1')
         }
         else {
-            const parsed = chrono.parseDate(timeInput, baseDate, {timezone: nowDate.offset, forwardDate: true})
-            if (!parsed) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral }); 
+            const parsed = chrono.parseDate(timeInput, baseDate, {timezone: nowDate.offset})
+            if (!parsed) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
+            if (parsed < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral}) 
             utcDate = DateTime.fromJSDate(parsed).setZone(userTimezone)
             console.log(utcDate)
             console.log('2')
