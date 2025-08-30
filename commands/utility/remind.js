@@ -42,25 +42,70 @@ module.exports = {
         const nowDate = DateTime.now().setZone(userTimezone)
         const baseDate = nowDate.toUTC().toJSDate()
         const hhmmRegex = /^([01]?\d|2[0-3]):[0-5]\d$/;
-        // const hhmmRegex = /((1[0-2]|0?[1-9]):([0-5][0-9]) ?([AaPp][Mm]))/
-        // let res = value.match(regex); if (res && res[0] === value) doSomething();
+        const dateTimeRegex = /^(?<words>[a-zA-Z\s]+)?\s*(?<time>\d{1,2}:\d{2})$/i;
         let utcDate;
+
         if (hhmmRegex.test(timeInput)){
-            const target = DateTime.fromFormat(timeInput, "H:mm", { zone: userTimezone });
-            console.log(target)
+            let target = DateTime.fromFormat(timeInput, "H:mm", {zone: userTimezone})
+                .set({
+                    year: nowDate.year,
+                    month: nowDate.month,
+                    day: nowDate.day
+                })
             if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
-            utcDate = target;
-            console.log('1')
+            utcDate = target
+        }
+        else if (timeInput.match(dateTimeRegex)){
+            const match = timeInput.match(dateTimeRegex)
+            const words = match.groups.words?.trim() || ""
+            const hhmm = match.groups.time;
+
+            const parsedDate = chrono.parseDate(words, baseDate, {timezone: nowDate.offset})
+            if (!parsedDate) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
+
+            const chronoDate = DateTime.fromJSDate(parsedDate).setZone(userTimezone)
+            const parsedTime = DateTime.fromFormat(hhmm, "H:mm", {zone: userTimezone})
+            let target = chronoDate.set({
+                hour: parsedTime.hour,
+                minute: parsedTime.minute,
+                second: 0,
+                millisecond: 0
+            })
+            if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
+            utcDate = target
         }
         else {
             const parsed = chrono.parseDate(timeInput, baseDate, {timezone: nowDate.offset})
             if (!parsed) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
-            if (parsed < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral}) 
-            utcDate = DateTime.fromJSDate(parsed).setZone(userTimezone)
-            console.log(utcDate)
-            console.log('2')
+            let target = DateTime.fromJSDate(parsed).setZone(userTimezone)
+            if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
+            utcDate = target
         }
         if (utcDate < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
+
+
+
+
+        // if (hhmmRegex.test(timeInput)){
+        //     const target = DateTime.fromFormat(timeInput, "H:mm", { zone: userTimezone });
+        //     if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
+        //     utcDate = target;
+        // }
+        // else if (timeInput.match(dateTimeRegex)){
+        //     const match = timeInput.match(dateTimeRegex)
+        //     const words = match.groups.words?.trim() || ""
+        //     const hhmm = match.groups.time
+        //     const targetDay = chrono.parseDate(words, {timezone: nowDate.offset})
+        //     const targetTime = DateTime.fromFormat(hhmm, "H:mm", {zone: userTimezone})
+        //     utcDate = DateTime.fromJSDate(targetDay).setZone(userTimezone) + DateTime.fromJSDate(targetTime).setZone(userTimezone)
+        // }
+        // else {
+        //     const parsed = chrono.parseDate(timeInput, baseDate, {timezone: nowDate.offset})
+        //     if (!parsed) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
+        //     if (parsed < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral}) 
+        //     utcDate = DateTime.fromJSDate(parsed).setZone(userTimezone)
+        // }
+        // if (utcDate < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
 
         // const nowDate = DateTime.now().setZone(userTimezone)
         // const hhmmRegex = /^([01]?\d|2[0-3]):[0-5]\d$/;
