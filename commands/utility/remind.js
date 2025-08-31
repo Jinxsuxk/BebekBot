@@ -43,19 +43,19 @@ module.exports = {
         const baseDate = nowDate.toUTC().toJSDate()
         const hhmmRegex = /^([01]?\d|2[0-3]):[0-5]\d$/;
         const dateTimeRegex = /^(?<words>[a-zA-Z\s]+)?\s*(?<time>\d{1,2}:\d{2})$/i;
+        const weekdayOnlyRegex = /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)$/i;
+        const dayMonthOnlyRegex = /^(\d{1,2})\s+(january|february|march|april|may|june|july|august|september|october|november|december)$/i;
+        //const weekdayRegex = /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s+(?<time>\d{1,2}:\d{2})$/i;
+        //const dayMonthRegex = /^(?<day>\d{1,2})\s+(?<month>[a-zA-Z]+)\s+(?<time>\d{1,2}:\d{2})$/i;
         let utcDate;
-
         if (hhmmRegex.test(timeInput)){
+            console.log('here1')
             let target = DateTime.fromFormat(timeInput, "H:mm", {zone: userTimezone})
-                .set({
-                    year: nowDate.year,
-                    month: nowDate.month,
-                    day: nowDate.day
-                })
             if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
             utcDate = target
         }
         else if (timeInput.match(dateTimeRegex)){
+            console.log('here2')
             const match = timeInput.match(dateTimeRegex)
             const words = match.groups.words?.trim() || ""
             const hhmm = match.groups.time;
@@ -67,21 +67,44 @@ module.exports = {
             const parsedTime = DateTime.fromFormat(hhmm, "H:mm", {zone: userTimezone})
             let target = chronoDate.set({
                 hour: parsedTime.hour,
-                minute: parsedTime.minute,
-                second: 0,
-                millisecond: 0
+                minute: parsedTime.minute
             })
+            if (target <= nowDate) {
+                if (/monday|tuesday|wednesday|thursday|friday|saturday|sunday/i.test(words)) {
+                    target = target.plus({ weeks: 1 })
+                } else {
+                    return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
+                }
+            }
+            utcDate = target
+        }
+        else if (timeInput.match(weekdayOnlyRegex)){
+            console.log('here3')
+            const weekdayName = timeInput.trim().toLowerCase()
+            const current = nowDate.startOf('day').weekday
+            const desiredWeekday = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"].indexOf(weekdayName) + 1;
+            let daysAhead = (desiredWeekday - current + 7) % 7
+            let target = nowDate.startOf('day').plus({ days: daysAhead });
+            if (target < nowDate) target = target.plus({weeks: 1})
+            utcDate = target
+        }
+        else if (dayMonthOnlyRegex.test(timeInput)){
+            console.log('here4')
+            const parsed = chrono.parseDate(timeInput, {timezone: nowDate.offset})
+            if (!parsed) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
+            let target = DateTime.fromJSDate(parsed, {zone: userTimezone}).startOf('day')
             if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
             utcDate = target
         }
         else {
+            console.log('here5')
             const parsed = chrono.parseDate(timeInput, baseDate, {timezone: nowDate.offset})
             if (!parsed) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
             let target = DateTime.fromJSDate(parsed).setZone(userTimezone)
             if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
             utcDate = target
         }
-        if (utcDate < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
+        //if (utcDate < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
 
 
 
