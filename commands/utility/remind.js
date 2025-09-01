@@ -62,35 +62,64 @@ module.exports = {
             const words = match.groups.words?.trim() || ""
             const hhmm = match.groups.time;
 
-            const parsedDate = chrono.parseDate(words, baseDate, {timezone: nowDate.offset})
-            if (!parsedDate) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
-
-            const chronoDate = DateTime.fromJSDate(parsedDate).setZone(userTimezone)
             const parsedTime = DateTime.fromFormat(hhmm, "H:mm", {zone: userTimezone})
-            let target = DateTime.fromObject(
-                {
-                    year: chronoDate.year,
-                    month: chronoDate.month,
-                    day: chronoDate.day,
+            const weekdays = ["sunday", "monday","tuesday","wednesday","thursday","friday","saturday"]
+            const weekdayIndex = weekdays.indexOf(words.toLowerCase())
+            let target;
+
+            if (weekdayIndex !== -1){
+                let currentWeekday = nowDate.weekday % 7
+                if (currentWeekday === 7) currentWeekday = 0
+                let daysToAdd = (weekdayIndex - currentWeekday + 7) % 7
+
+                target = nowDate.startOf('day').plus({days: daysToAdd}).set({
                     hour: parsedTime.hour,
                     minute: parsedTime.minute,
                     second: 0,
                     millisecond: 0
-                },
-                { zone: userTimezone }
-            );
-            // let target = chronoDate.set({
-            //     hour: parsedTime.hour,
-            //     minute: parsedTime.minute
-            // })
-            if (target <= nowDate) {
-                if (/monday|tuesday|wednesday|thursday|friday|saturday|sunday/i.test(words)) {
-                    target = target.plus({ weeks: 1 })
-                } else {
-                    return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
-                }
+                })
+                if (target <= nowDate) target = target.plus({weeks: 1})
+            } else {
+                const parsedDate = chrono.parseDate(words, baseDate, {timezone: nowDate.offset})
+                if (!parsedDate) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
+                const chronoDate = DateTime.fromJSDate(parsedDate).setZone(userTimezone)
+                target = chronoDate.set({
+                    hour: parsedTime.hour,
+                    minute: parsedTime.minute,
+                    second: 0,
+                    millisecond: 0
+                });
+                if (target <= nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
             }
             utcDate = target
+
+
+
+            // const parsedDate = chrono.parseDate(words, baseDate, {timezone: nowDate.offset})
+            // if (!parsedDate) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
+
+            // const chronoDate = DateTime.fromJSDate(parsedDate).setZone(userTimezone)
+            // const parsedTime = DateTime.fromFormat(hhmm, "H:mm", {zone: userTimezone})
+            // let target = DateTime.fromObject(
+            //     {
+            //         year: chronoDate.year,
+            //         month: chronoDate.month,
+            //         day: chronoDate.day,
+            //         hour: parsedTime.hour,
+            //         minute: parsedTime.minute,
+            //         second: 0,
+            //         millisecond: 0
+            //     },
+            //     { zone: userTimezone }
+            // );
+            // if (target <= nowDate) {
+            //     if (/monday|tuesday|wednesday|thursday|friday|saturday|sunday/i.test(words)) {
+            //         target = target.plus({ weeks: 1 })
+            //     } else {
+            //         return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
+            //     }
+            // }
+            // utcDate = target
         }
         else if (timeInput.match(weekdayOnlyRegex)){
             console.log('here3')
