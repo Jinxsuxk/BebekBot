@@ -48,6 +48,7 @@ module.exports = {
         //const weekdayRegex = /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s+(?<time>\d{1,2}:\d{2})$/i;
         //const dayMonthRegex = /^(?<day>\d{1,2})\s+(?<month>[a-zA-Z]+)\s+(?<time>\d{1,2}:\d{2})$/i;
         let utcDate;
+        //dayMonthtime need
         if (hhmmRegex.test(timeInput)){
             console.log('here1')
             let target = DateTime.fromFormat(timeInput, "H:mm", {zone: userTimezone})
@@ -55,6 +56,7 @@ module.exports = {
             utcDate = target
         }
         else if (timeInput.match(dateTimeRegex)){
+            //here still wrong friday with time
             console.log('here2')
             const match = timeInput.match(dateTimeRegex)
             const words = match.groups.words?.trim() || ""
@@ -65,10 +67,22 @@ module.exports = {
 
             const chronoDate = DateTime.fromJSDate(parsedDate).setZone(userTimezone)
             const parsedTime = DateTime.fromFormat(hhmm, "H:mm", {zone: userTimezone})
-            let target = chronoDate.set({
-                hour: parsedTime.hour,
-                minute: parsedTime.minute
-            })
+            let target = DateTime.fromObject(
+                {
+                    year: chronoDate.year,
+                    month: chronoDate.month,
+                    day: chronoDate.day,
+                    hour: parsedTime.hour,
+                    minute: parsedTime.minute,
+                    second: 0,
+                    millisecond: 0
+                },
+                { zone: userTimezone }
+            );
+            // let target = chronoDate.set({
+            //     hour: parsedTime.hour,
+            //     minute: parsedTime.minute
+            // })
             if (target <= nowDate) {
                 if (/monday|tuesday|wednesday|thursday|friday|saturday|sunday/i.test(words)) {
                     target = target.plus({ weeks: 1 })
