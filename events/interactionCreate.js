@@ -1,4 +1,4 @@
-const {Events, MessageFlags, Collection} = require('discord.js')
+const {Events, MessageFlags, Collection, DiscordAPIError} = require('discord.js')
 
 module.exports = {
     name: Events.InteractionCreate,
