@@ -41,10 +41,28 @@ module.exports = {
             await command.execute(interaction)
         } catch (error) {
             console.error(error);
-            if (interaction.replied || interaction.deferred){
-                await interaction.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
+            if (error instanceof DiscordAPIError && error.code === 10062) {
+                try {
+                    await interaction.channel.send({
+                        content: "⚠️ Please wait a moment — the server is restarting."
+                    });
+                } catch (innerErr) {
+                    console.error("Failed to send 10062 fallback message:", innerErr);
+                }
+                return;
+            }
+
+            // General error fallback
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp({
+                    content: '❌ There was an error while executing this command!',
+                    flags: MessageFlags.Ephemeral
+                });
             } else {
-                await interaction.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
+                await interaction.reply({
+                    content: '❌ There was an error while executing this command!',
+                    flags: MessageFlags.Ephemeral
+                });
             }
         }
     }
