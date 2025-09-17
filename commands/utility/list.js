@@ -8,7 +8,7 @@ module.exports = {
         .setDescription('Show your reminders')
         .setContexts([0, 1, 2]),
     async execute(interaction) {
-        await interaction.deferReply({flags: MessageFlags.Ephemeral})
+        await interaction.deferReply()
         const userId = interaction.user.id
         const {data: userData} = await supabase
             .from('users')
@@ -49,7 +49,8 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setTitle(`${interaction.user.username}'s Reminders`)
                 .setDescription(description || 'No reminders on this page.')
-                .setFooter({ text: `Page ${page + 1}/${totalPages} • ${reminders.length} total` });
+                .setFooter({ text: `Page ${page + 1}/${totalPages} • ${reminders.length} total` })
+                .setColor(0xFFD700);
             return embed
         }
 
