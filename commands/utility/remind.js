@@ -111,22 +111,32 @@ module.exports = {
         }
         else if (dayMonthTimeRegex.test(timeInput)){
             console.log('5')
-            const parts = timeInput.split(/\s+(?=\d{1,2}:\d{2}$)/)
-            const dayMonth = parts[0]
-            const hhmm = parts[1]
-
-            const parsedDate = chrono.parseDate(dayMonth, baseDate, {timezone: nowDate.offset})
-            if (!parsedDate) return interaction.reply({content: '❌ Invalid date.', flags: MessageFlags.Ephemeral})
-            let chronoDate = DateTime.fromJSDate(parsedDate).setZone(userTimezone)
-            let parsedTime = DateTime.fromFormat(hhmm, "H:mm", { zone: userTimezone });
-            let target = chronoDate.set({
-                hour: parsedTime.hour,
-                minute: parsedTime.minute,
-                second: 0,
-                millisecond: 0
-            })
+            const { day, month, time } = dayMonthTimeRegex.exec(timeInput).groups;
+            let target = DateTime.fromFormat(
+                `${day} ${month} ${time}`,
+                "d LLLL H:mm",
+                { zone: userTimezone }
+            ).set({ second: 0, millisecond: 0 });
+            if (!target.isValid) return interaction.reply({content: '❌ Invalid date.', flags: MessageFlags.Ephemeral})
             if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
             utcDate = target
+        
+            // const parts = timeInput.split(/\s+(?=\d{1,2}:\d{2}$)/)
+            // const dayMonth = parts[0]
+            // const hhmm = parts[1]
+
+            // const parsedDate = chrono.parseDate(dayMonth, baseDate, {timezone: nowDate.offset})
+            // if (!parsedDate) return interaction.reply({content: '❌ Invalid date.', flags: MessageFlags.Ephemeral})
+            // let chronoDate = DateTime.fromJSDate(parsedDate).setZone(userTimezone)
+            // let parsedTime = DateTime.fromFormat(hhmm, "H:mm", { zone: userTimezone });
+            // let target = chronoDate.set({
+            //     hour: parsedTime.hour,
+            //     minute: parsedTime.minute,
+            //     second: 0,
+            //     millisecond: 0
+            // })
+            // if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
+            // utcDate = target
         }
         else {
             console.log('6')
