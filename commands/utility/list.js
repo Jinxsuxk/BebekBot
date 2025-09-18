@@ -8,7 +8,7 @@ module.exports = {
         .setDescription('Show your reminders')
         .setContexts([0, 1, 2]),
     async execute(interaction) {
-        await interaction.deferReply()
+        await interaction.deferReply({flags: MessageFlags.Ephemeral})
         const userId = interaction.user.id
         const {data: userData} = await supabase
             .from('users')

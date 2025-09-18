@@ -49,11 +49,13 @@ module.exports = {
         let utcDate;
         
         if (hhmmRegex.test(timeInput)){
+            console.log('1')
             let target = DateTime.fromFormat(timeInput, "H:mm", {zone: userTimezone})
             if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
             utcDate = target
         }
         else if (dateTimeRegex.test(timeInput)){
+            console.log('2')
             const match = timeInput.match(dateTimeRegex)
             const words = match.groups.words?.trim() || ""
             const hhmm = match.groups.time;
@@ -90,6 +92,7 @@ module.exports = {
             utcDate = target
         }
         else if (weekdayOnlyRegex.test(timeInput)){
+            console.log('3')
             const weekdayName = timeInput.trim().toLowerCase()
             const current = nowDate.startOf('day').weekday
             const desiredWeekday = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"].indexOf(weekdayName) + 1;
@@ -99,6 +102,7 @@ module.exports = {
             utcDate = target
         }
         else if (dayMonthOnlyRegex.test(timeInput)){
+            console.log('4')
             const parsed = chrono.parseDate(timeInput, {timezone: nowDate.offset})
             if (!parsed) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
             let target = DateTime.fromJSDate(parsed, {zone: userTimezone}).startOf('day')
@@ -106,6 +110,7 @@ module.exports = {
             utcDate = target
         }
         else if (dayMonthTimeRegex.test(timeInput)){
+            console.log('5')
             const parts = timeInput.split(/\s+(?=\d{1,2}:\d{2}$)/)
             const dayMonth = parts[0]
             const hhmm = parts[1]
@@ -124,6 +129,7 @@ module.exports = {
             utcDate = target
         }
         else {
+            console.log('6')
             const parsed = chrono.parseDate(timeInput, baseDate, {timezone: nowDate.offset})
             if (!parsed) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
             let target = DateTime.fromJSDate(parsed).setZone(userTimezone)
