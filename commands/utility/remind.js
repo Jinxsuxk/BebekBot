@@ -63,29 +63,27 @@ module.exports = {
         // adjust hour if needed
         const mer = (typeof res.start.get === 'function') ? res.start.get('meridiem') : undefined;
         if (mer !== undefined) {
-        // if meridiem=1 (PM) and hour < 12, add 12
-        if (mer === 1 && hour < 12) hour += 12;
-        // if meridiem=0 (AM) and hour === 12, make it 0
-        if (mer === 0 && hour === 12) hour = 0;
+            // if meridiem=1 (PM) and hour < 12, add 12
+            if (mer === 1 && hour < 12) hour += 12;
+        }
+        let target
+        const start = results[0].start
+        if (start.isCertain('hour') || start.isCertain('minute')) {
+            target = DateTime.fromObject(   
+            { year, month, day, hour, minute, second, millisecond: 0 },
+            { zone: userTimezone }
+            )
+        } else {
+            target = DateTime.fromJSDate(start.date(), {zone: userTimezone})
         }
 
-        // Build Luxon DateTime explicitly in user's zone (no JS Date conversions)
-        let target = DateTime.fromObject(
-        { year, month, day, hour, minute, second, millisecond: 0 },
-        { zone: userTimezone }
-        );
-
-        // If chrono implied a weekday (e.g., "monday") it may have computed day accordingly. If target < nowDate
-        // chrono's forwardDate option tries to prefer the future; otherwise you can choose to add a day/week here.
         if (target < nowDate) {
         return interaction.reply({
             content: '❌ That time has already passed. Please enter a future time.',
             flags: MessageFlags.Ephemeral
         });
         }
-
         const utcDate = target.toUTC();
-
 
         let guildId = false;
         if (interaction.guild) {
