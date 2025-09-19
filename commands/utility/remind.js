@@ -40,7 +40,16 @@ module.exports = {
         const message = interaction.options.getString('message');
 
         const nowDate = DateTime.now().setZone(userTimezone);
-        const results = chrono.parse(timeInput, nowDate.toJSDate(), { forwardDate: true });
+        const nowForChrono = new Date(
+            nowDate.year,
+            nowDate.month - 1,
+            nowDate.day,
+            nowDate.hour,
+            nowDate.minute,
+            nowDate.second,
+            nowDate.millisecond
+        );
+        const results = chrono.parse(timeInput, nowForChrono, { forwardDate: true });
         if (!results || results.length === 0) {
         return interaction.reply({
             content: '❌ I could not understand that time.',
