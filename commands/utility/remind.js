@@ -40,8 +40,6 @@ module.exports = {
         const message = interaction.options.getString('message');
 
         const nowDate = DateTime.now().setZone(userTimezone);
-
-        // Parse in user's local time context (keep forwardDate if you prefer chrono to prefer future)
         const results = chrono.parse(timeInput, nowDate.toJSDate(), { forwardDate: true });
         if (!results || results.length === 0) {
         return interaction.reply({
@@ -51,16 +49,9 @@ module.exports = {
         }
 
         const res = results[0];
-
-        // DEBUG (optional) - useful to print once if things still look wrong
-        // console.log('chrono start knownValues:', res.start.knownValues);
-        // console.log('chrono start impliedValues:', res.start.impliedValues);
-        // console.log('chrono start tags:', res.start.get('timezoneOffset'), res.start.get('meridiem'));
-
         const kv = res.start.knownValues || {};
         const iv = res.start.impliedValues || {};
 
-        // pick values: prefer knownValues, fallback to implied, fallback to nowDate
         const year   = kv.year   ?? iv.year   ?? nowDate.year;
         const month  = kv.month  ?? iv.month  ?? nowDate.month;
         const day    = kv.day    ?? iv.day    ?? nowDate.day;
@@ -121,6 +112,7 @@ module.exports = {
         }
 
         const unix = Math.floor(utcDate.toSeconds());
-        await interaction.reply(`✅ I will remind you to **${message}** on <t:${unix}:F>`);
+        const display = utcDate.setZone(userTimezone).toFormat("h:mm a")
+        await interaction.reply(`✅ I will remind you to **${message}** on <t:${unix}:D> at ${display}`);
     }
 }
