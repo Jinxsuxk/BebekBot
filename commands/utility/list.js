@@ -47,7 +47,7 @@ module.exports = {
             }).join('\n');
 
             const embed = new EmbedBuilder()
-                .setTitle(`${interaction.user.username}'s Reminders`)
+                .setTitle(`Your Reminders`)
                 .setDescription(description || 'No reminders on this page.')
                 .setFooter({ text: `Page ${page + 1}/${totalPages} • ${reminders.length} total` })
                 .setColor(0xFFD700);
