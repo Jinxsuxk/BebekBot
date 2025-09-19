@@ -74,7 +74,7 @@ module.exports = {
             { zone: userTimezone }
             )
         } else {
-            target = DateTime.fromJSDate(start.date(), {zone: userTimezone})
+            target = DateTime.fromJSDate(results, {zone: userTimezone})
         }
 
         if (target < nowDate) {
