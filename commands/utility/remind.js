@@ -38,6 +38,7 @@ module.exports = {
         const userTimezone = userData.timezone;
         const timeInput = interaction.options.getString('time');
         const message = interaction.options.getString('message')
+        console.log(timeInput)
 
         const nowDate = DateTime.now().setZone(userTimezone)
         const baseDate = nowDate.toUTC().toJSDate()
@@ -120,23 +121,6 @@ module.exports = {
             if (!target.isValid) return interaction.reply({content: '❌ Invalid date.', flags: MessageFlags.Ephemeral})
             if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
             utcDate = target
-        
-            // const parts = timeInput.split(/\s+(?=\d{1,2}:\d{2}$)/)
-            // const dayMonth = parts[0]
-            // const hhmm = parts[1]
-
-            // const parsedDate = chrono.parseDate(dayMonth, baseDate, {timezone: nowDate.offset})
-            // if (!parsedDate) return interaction.reply({content: '❌ Invalid date.', flags: MessageFlags.Ephemeral})
-            // let chronoDate = DateTime.fromJSDate(parsedDate).setZone(userTimezone)
-            // let parsedTime = DateTime.fromFormat(hhmm, "H:mm", { zone: userTimezone });
-            // let target = chronoDate.set({
-            //     hour: parsedTime.hour,
-            //     minute: parsedTime.minute,
-            //     second: 0,
-            //     millisecond: 0
-            // })
-            // if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
-            // utcDate = target
         }
         else {
             console.log('6')
@@ -172,6 +156,7 @@ module.exports = {
         }
 
         const unix = Math.floor(utcDate.toSeconds());
-        await interaction.reply(`✅ I will remind you to **${message}** at <t:${unix}:F>`);
+        const display = utcDate.toFormat("h:mm a")
+        await interaction.reply(`✅ I will remind you to **${message}** on <t:${unix}:D> at ${display}`);
     }
 }
