@@ -40,7 +40,7 @@ module.exports = {
         const message = interaction.options.getString('message')
 
         const nowDate = DateTime.now().setZone(userTimezone)
-        const baseDate = nowDate.toUTC().toJSDate()
+        //const baseDate = nowDate.toUTC().toJSDate()
 
         const results = chrono.parse(timeInput, nowDate.toJSDate(), { timezone: nowDate.offset });
         if (!results || results.length === 0) {
@@ -64,7 +64,7 @@ module.exports = {
             });
         }
 
-        let utcDate = target
+        let utcDate = target.toUTC()
 
 
         // const hhmmRegex = /^([01]?\d|2[0-3]):[0-5]\d$/;
@@ -181,7 +181,8 @@ module.exports = {
         }
 
         const unix = Math.floor(utcDate.toSeconds());
-        const display = utcDate.toFormat("h:mm a")
-        await interaction.reply(`✅ I will remind you to **${message}** on <t:${unix}:D> at ${display}`);
+        //const display = utcDate.toFormat("h:mm a")
+        //await interaction.reply(`✅ I will remind you to **${message}** on <t:${unix}:D> at ${display}`);
+        await interaction.reply(`✅ I will remind you to **${message}** on <t:${unix}:F>`);
     }
 }
