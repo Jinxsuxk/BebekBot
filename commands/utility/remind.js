@@ -59,6 +59,10 @@ module.exports = {
         const minute = kv.minute ?? 0;
         const second = kv.second ?? 0;
 
+        if (!res.start.isCertain('meridiem') && kv.hour !== undefined) {
+            // Force 24-hour interpretation, do not shift by AM/PM rules
+            hour = kv.hour;
+        }
         // chrono sometimes exposes meridiem via res.start.get('meridiem') (0 = AM, 1 = PM)
         // adjust hour if needed
         const mer = (typeof res.start.get === 'function') ? res.start.get('meridiem') : undefined;
