@@ -52,7 +52,7 @@ module.exports = {
 
         // Wrap parsed result into Luxon in user’s timezone
         const parsedDate = results[0].start.date();
-        let target = DateTime.fromJSDate(parsedDate, { zone: userTimezone });
+        let target = DateTime.fromMillis(parsedDate.getTime(), { zone: userTimezone });
 
         if (target < nowDate) {
             return interaction.reply({
