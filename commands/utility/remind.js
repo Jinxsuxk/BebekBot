@@ -47,23 +47,39 @@ module.exports = {
             flags: MessageFlags.Ephemeral
         });
         }
-        console.log(results)
         const res = results[0];
-        console.log(res)
         const kv = res.start.knownValues || {};
         const iv = res.start.impliedValues || {};
 
         const year   = kv.year   ?? iv.year   ?? nowDate.year;
         const month  = kv.month  ?? iv.month  ?? nowDate.month;
         const day    = kv.day    ?? iv.day    ?? nowDate.day;
-        let hour     = kv.hour   ?? 0;
-        const minute = kv.minute ?? 0;
+        let hour     = kv.hour
+        let minute   = kv.minute
         const second = kv.second ?? 0;
 
-        if (!res.start.isCertain('meridiem') && kv.hour !== undefined) {
-            // Force 24-hour interpretation, do not shift by AM/PM rules
-            hour = kv.hour;
+        const explicitTimeRegex = /(?:^|\s)([01]?\d|2[0-3])(?::([0-5]\d))?\s*(am|pm)?(?=\s|$)/i;
+        const execRes = explicitTimeRegex.exec(timeInput);
+        if (hour === undefined && execRes) {
+        // make sure the matched number isn't actually the day followed by a month, e.g. "8 June"
+        const afterMatch = timeInput.slice(execRes.index + execRes[0].length);
+        const monthNameRegex = /\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b/i;
+
+            if (!monthNameRegex.test(afterMatch)) {
+                hour = parseInt(execRes[1], 10);
+                minute = execRes[2] ? parseInt(execRes[2], 10) : 0;
+
+                // handle explicit am/pm in the raw input
+                const rawAmpm = execRes[3];
+                if (rawAmpm) {
+                    const mer = rawAmpm.toLowerCase() === 'pm' ? 1 : 0;
+                    if (mer === 1 && hour < 12) hour += 12;
+                    if (mer === 0 && hour === 12) hour = 0;
+                }
+            }
         }
+        hour = hour ?? 0
+        minute = minute ?? 0
         // chrono sometimes exposes meridiem via res.start.get('meridiem') (0 = AM, 1 = PM)
         // adjust hour if needed
         const mer = (typeof res.start.get === 'function') ? res.start.get('meridiem') : undefined;
