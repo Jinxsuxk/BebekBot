@@ -51,10 +51,10 @@ module.exports = {
         );
         const results = chrono.parse(timeInput, nowForChrono, { forwardDate: true });
         if (!results || results.length === 0) {
-        return interaction.reply({
-            content: '❌ I could not understand that time.',
-            flags: MessageFlags.Ephemeral
-        });
+            return interaction.reply({
+                content: '❌ I could not understand that time.',
+                flags: MessageFlags.Ephemeral
+            });
         }
         const res = results[0];
         const kv = res.start.knownValues || {};
@@ -63,33 +63,16 @@ module.exports = {
         const year   = kv.year   ?? iv.year   ?? nowDate.year;
         const month  = kv.month  ?? iv.month  ?? nowDate.month;
         const day    = kv.day    ?? iv.day    ?? nowDate.day;
-        let hour     = kv.hour
-        let minute   = kv.minute
-        const second = kv.second ?? 0;
+        let hour     = kv.hour   ?? 0
+        let minute   = kv.minute ?? 0
+        const second = kv.second ?? 0
 
-        const explicitTimeRegex = /(?:^|\s)([01]?\d|2[0-3])(?::([0-5]\d))?\s*(am|pm)?(?=\s|$)/i;
-        const execRes = explicitTimeRegex.exec(timeInput);
-        if (hour === undefined && execRes) {
-        const afterMatch = timeInput.slice(execRes.index + execRes[0].length);
-        const monthNameRegex = /\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b/i;
-            if (!monthNameRegex.test(afterMatch)) {
-                hour = parseInt(execRes[1], 10);
-                minute = execRes[2] ? parseInt(execRes[2], 10) : 0;
-                const rawAmpm = execRes[3];
-                if (rawAmpm) {
-                    const mer = rawAmpm.toLowerCase() === 'pm' ? 1 : 0;
-                    if (mer === 1 && hour < 12) hour += 12;
-                    if (mer === 0 && hour === 12) hour = 0;
-                }
-            }
+        const hasExplicitTime = /\b\d{1,2}(:\d{2})?\s*(am|pm)?\b/i.test(timeInput);
+        if (!hasExplicitTime && timeInput.toLowerCase().includes('day')) {
+            hour = 0;
+            minute = 0;
         }
-        hour = hour ?? 0
-        minute = minute ?? 0
-        const mer = (typeof res.start.get === 'function') ? res.start.get('meridiem') : undefined;
-        if (mer !== undefined) {
-            if (mer === 1 && hour < 12) hour += 12;
-            if (mer === 0 && hour === 12) hour = 0;
-        }
+
         let target = DateTime.fromObject( 
             { year, month, day, hour, minute, second, millisecond: 0 }, 
             { zone: userTimezone } 
