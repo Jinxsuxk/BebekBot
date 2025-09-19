@@ -55,9 +55,9 @@ module.exports = {
         const year   = kv.year   ?? iv.year   ?? nowDate.year;
         const month  = kv.month  ?? iv.month  ?? nowDate.month;
         const day    = kv.day    ?? iv.day    ?? nowDate.day;
-        let hour    = kv.hour   ?? iv.hour   ?? 0;
-        const minute = kv.minute ?? iv.minute ?? 0;
-        const second = kv.second ?? iv.second ?? 0;
+        let hour     = kv.hour   ?? 0;
+        const minute = kv.minute ?? 0;
+        const second = kv.second ?? 0;
 
         // chrono sometimes exposes meridiem via res.start.get('meridiem') (0 = AM, 1 = PM)
         // adjust hour if needed
