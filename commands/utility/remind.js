@@ -42,7 +42,8 @@ module.exports = {
         const nowDate = DateTime.now().setZone(userTimezone)
         //const baseDate = nowDate.toUTC().toJSDate()
 
-        const results = chrono.parse(timeInput, nowDate.toJSDate(), { timezone: nowDate.offset });
+        //const results = chrono.parse(timeInput, nowDate.toJSDate(), { timezone: nowDate.offset });
+        const results = chrono.parse(timeInput, nowDate.toJSDate(), { timezone: nowDate.offset / 60 });
         if (!results || results.length === 0) {
             return interaction.reply({
                 content: '❌ I could not understand that time.',
