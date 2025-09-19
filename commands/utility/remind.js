@@ -47,8 +47,9 @@ module.exports = {
             flags: MessageFlags.Ephemeral
         });
         }
-
+        console.log(results)
         const res = results[0];
+        console.log(res)
         const kv = res.start.knownValues || {};
         const iv = res.start.impliedValues || {};
 
