@@ -65,17 +65,12 @@ module.exports = {
         if (mer !== undefined) {
             // if meridiem=1 (PM) and hour < 12, add 12
             if (mer === 1 && hour < 12) hour += 12;
+            if (mer === 0 && hour === 12) hour = 0;
         }
-        let target
-        const start = results[0].start
-        if (start.isCertain('hour') || start.isCertain('minute')) {
-            target = DateTime.fromObject(   
-            { year, month, day, hour, minute, second, millisecond: 0 },
-            { zone: userTimezone }
-            )
-        } else {
-            target = DateTime.fromJSDate(results, {zone: userTimezone})
-        }
+        let target = DateTime.fromObject( 
+            { year, month, day, hour, minute, second, millisecond: 0 }, 
+            { zone: userTimezone } 
+        );
 
         if (target < nowDate) {
         return interaction.reply({
