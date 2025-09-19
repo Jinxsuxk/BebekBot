@@ -19,7 +19,7 @@ module.exports = {
     async execute(interaction){
         if (interaction.context === 2) {
             return interaction.reply({
-                content: "❌ Sorry, I cannot send reminders in group DMs. Please use a server channel or DM me directly.", 
+                content: "❌ Sorry, I cannot send reminders here. Please use a server channel or DM me directly.", 
                 flags: MessageFlags.Ephemeral
             });
         }
@@ -38,7 +38,13 @@ module.exports = {
         const userTimezone = userData.timezone;
         const timeInput = interaction.options.getString('time');
         const message = interaction.options.getString('message')
-        console.log(timeInput)
+        // if (timeInput.includes('pm')) {
+        //     timeInput.toLowerCase().trim()
+        //     timeInput = timeInput.replace(/\s+/g, " ")
+        //     const parts = timeInput.split(' ')
+        //     let timePart = parts[0]
+        //     const meridian = parts[1]
+        // }
 
         const nowDate = DateTime.now().setZone(userTimezone)
         const baseDate = nowDate.toUTC().toJSDate()
@@ -125,8 +131,10 @@ module.exports = {
         else {
             console.log('6')
             const parsed = chrono.parseDate(timeInput, baseDate, {timezone: nowDate.offset})
+            console.log(parsed)
             if (!parsed) return interaction.reply({ content: '❌ I could not understand that time.', flags: MessageFlags.Ephemeral });
             let target = DateTime.fromJSDate(parsed).setZone(userTimezone)
+            console.log(target)
             if (target < nowDate) return interaction.reply({content: '❌ That time has already passed. Please enter a future time.', flags: MessageFlags.Ephemeral})
             utcDate = target
         }
