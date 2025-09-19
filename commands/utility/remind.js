@@ -29,12 +29,7 @@ module.exports = {
             .select('timezone')
             .eq('user_id', userId)
             .single();
-        if (!userData) {
-            return interaction.reply({
-                content: "❌ You haven't set your timezone yet. Please use `/settimezone` first.",
-                flags: MessageFlags.Ephemeral
-            });
-        }
+        if (!userData) return interaction.reply("✋ Waittt! First, tell me your timezone with `/settimezone` before I can set reminders. One-time setup — unless you plan to travel at light speed! 😄")
         const userTimezone = userData.timezone;
         const timeInput = interaction.options.getString('time');
         const message = interaction.options.getString('message');
