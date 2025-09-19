@@ -53,6 +53,6 @@ module.exports = {
     const parts = formatter.formatToParts(new Date());
     const tzName = parts.find(p => p.type === "timeZoneName")?.value;
 
-    await interaction.reply(`✅ Your timezone has been set to **${timezone}** (${tzName}).`);
+    await interaction.reply(`✅ Your timezone has been set to (${tzName}).`);
   }
 };
